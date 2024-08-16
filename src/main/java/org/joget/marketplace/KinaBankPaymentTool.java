@@ -173,7 +173,7 @@ public class KinaBankPaymentTool extends DefaultApplicationPlugin implements Plu
 
             Enumeration<String> parameterNames = request.getParameterNames();
             Map<String, String> formData = new HashMap<>();
-            
+
             // Iterate over the parameter names and append each parameter and its value to the response content
             while (parameterNames.hasMoreElements()) {
                 String paramName = parameterNames.nextElement();
@@ -292,17 +292,19 @@ public class KinaBankPaymentTool extends DefaultApplicationPlugin implements Plu
     }
 
     public static String generateNonce(int length) {
-        if (length < 1 || length > 32) {
-            throw new IllegalArgumentException("Length must be between 1 and 32");
+        if (length < 8 || length > 32) {
+            throw new IllegalArgumentException("Length must be between 8 and 32");
         }
 
-        StringBuilder nonce = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            int index = RANDOM.nextInt(CHARACTERS.length());
-            nonce.append(CHARACTERS.charAt(index));
+        byte[] randomBytes = new byte[length];
+        RANDOM.nextBytes(randomBytes);
+
+        StringBuilder nonce = new StringBuilder(length * 2);
+        for (byte b : randomBytes) {
+            nonce.append(String.format("%02x", b));
         }
 
-        return nonce.toString();
+        return nonce.toString().toUpperCase();
     }
 
     private void appendLengthPrefixed(StringBuilder sb, String value) {
